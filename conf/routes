@@ -6,5 +6,13 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 
+GET		/csv/:id					controllers.CSVController.getCSVWithId(id: String)
+
+POST	/csv						controllers.CSVController.createCSV
+
+POST	/csv/:id/content			controllers.CSVController.uploadCSV(id: String)
+
+DELETE	/csv/:id					controllers.CSVController.deleteCSV(id: String)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
