@@ -6,9 +6,13 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 
+GET		/csv						controllers.CSVController.getCSVs
+
 GET		/csv/:id					controllers.CSVController.getCSVWithId(id: String)
 
 POST	/csv						controllers.CSVController.createCSV
+
+GET		/csv/:id/content			controllers.CSVController.getCSV(id: String)
 
 POST	/csv/:id/content			controllers.CSVController.uploadCSV(id: String)
 
