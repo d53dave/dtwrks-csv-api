@@ -7,6 +7,11 @@ import play.api.libs.json.Json
 import play.api.Logger
 import scala.concurrent.Future
 import service.CSVService
+import akka.stream.scaladsl.FileIO
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
+import better.files.File
+import play.api.http.HttpEntity
 
 @Singleton
 class CSVController @Inject() (csvService: CSVService) extends Controller {
@@ -22,6 +27,23 @@ class CSVController @Inject() (csvService: CSVService) extends Controller {
     }
 
     val parser = action.parser
+  }
+
+  def getCSVs = Action {
+    Ok(Json.toJson(csvService.getAllUploadedCSVs()))
+  }
+
+  def getCSV(id: String) = Action {
+    csvService.getCSVMetaData(id) match {
+      case Some(csv) => {
+        val source: Source[ByteString, _] = FileIO.fromPath(File(csv.path).path)
+        val name = csvService.getNameWithoutId(csv.filename)
+        Result(
+          header = ResponseHeader(200, Map("Content-Disposition" -> s"attachment;filename=$name")),
+          body = HttpEntity.Streamed(source, None, Some("text/csv")))
+      }
+      case None => NotFound
+    }
   }
 
   def createCSV = Action { request =>
