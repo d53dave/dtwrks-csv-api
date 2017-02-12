@@ -26,7 +26,7 @@ class FilesystemStorage extends FileStorageProvider {
     logger.debug(s"Getting all available files")
     val base = File(basePath)
     val matches: Iterator[File] = base.glob("**/*")
-    matches.map(f => f.name).toSeq
+    matches.filter(p => !p.isDirectory).map(f => f.name).toSeq
   }
   
   override def getPath(fileName: String): String = {
