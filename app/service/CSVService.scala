@@ -5,6 +5,7 @@ import storage.FileStorageProvider
 import util.StreamingCSVBodyParser
 import model.CSVUpload
 import play.api.mvc.BodyParsers
+import play.api.Logger
 
 class CSVService @Inject() (storageProvider: FileStorageProvider) {
   
@@ -13,6 +14,10 @@ class CSVService @Inject() (storageProvider: FileStorageProvider) {
       case Some(csv) => StreamingCSVBodyParser.buildStreamingBodyParser(storageProvider.getWriteableStream(csv.filename))
       case None      => BodyParsers.parse.empty
     }
+  }
+  
+  def getNameWithoutId(name: String): String = {
+    if(name.length() > 36) name.substring(36) else name
   }
 
   def getNewCSVUpload(name: String) = {
@@ -24,15 +29,16 @@ class CSVService @Inject() (storageProvider: FileStorageProvider) {
   def deleteCSVifFound(id: String): Boolean = {
     getCSVMetadata(id) match {
       case Some(csv) =>
-        storageProvider.deleteFile(id); true
+        storageProvider.deleteFile(csv.filename); true
       case None => false
     }
   }
   
   def getAllUploadedCSVs(): Seq[CSVUpload] = {
     storageProvider.getFileNames().map { name => 
+      Logger("application").debug(s"getAllUploadedCSVs processing $name")
       val id = name.substring(0, 36); // UUIDs are 32 hex digits + 4 dashes
-      CSVUpload(id, name, storageProvider.getPath(name))
+      CSVUpload(id, getNameWithoutId(name), storageProvider.getPath(name))
     }
   }
 
@@ -41,7 +47,7 @@ class CSVService @Inject() (storageProvider: FileStorageProvider) {
   }
 
   private def getCSVMetadata(id: String): Option[CSVUpload] = {
-    storageProvider.getFileNames().find(name => name.startsWith(id)).map(name => CSVUpload(id, name, id + storageProvider.getPath(name)))
+    storageProvider.getFileNames().find(name => name.startsWith(id)).map(name => CSVUpload(id, name, storageProvider.getPath(name)))
   }
 
 }
