@@ -2,11 +2,11 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
-import model.CSVUpload
+import models.CSVUpload
 import play.api.libs.json.Json
 import play.api.Logger
 import scala.concurrent.Future
-import service.CSVService
+import services.CSVService
 import akka.stream.scaladsl.FileIO
 import akka.stream.scaladsl.Source
 import akka.util.ByteString

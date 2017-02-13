@@ -1,4 +1,4 @@
-package service
+package services
 
 import play.api.ConfigLoader
 import java.util.UUID
@@ -6,12 +6,12 @@ import scala.util.Properties
 import kafka.message.DefaultCompressionCodec
 import kafka.message.NoCompressionCodec
 import java.util.Properties
-import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.{KafkaProducer => ApacheKafkaProducer}
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import com.typesafe.config.ConfigFactory
 
-case class KfkProducer(
+case class KafkaProducer(
     topic: String,
     brokerList: String,
     /**
@@ -83,7 +83,7 @@ case class KfkProducer(
   props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
   props.put("client.id", clientId.toString)
 
-  val producer = new KafkaProducer[AnyRef, AnyRef](props)
+  val producer = new ApacheKafkaProducer[AnyRef, AnyRef](props)
 
   def kafkaMesssage(message: Array[Byte], partition: Array[Byte]): ProducerRecord[AnyRef, AnyRef] = {
     if (partition == null) {

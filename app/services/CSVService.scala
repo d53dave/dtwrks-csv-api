@@ -1,9 +1,9 @@
-package service
+package services
 
 import com.google.inject.Inject
 import storage.FileStorageProvider
 import util.StreamingCSVBodyParser
-import model.CSVUpload
+import models.CSVUpload
 import play.api.mvc.BodyParsers
 import play.api.Logger
 import akka.actor.ActorRef

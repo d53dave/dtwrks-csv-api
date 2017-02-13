@@ -1,12 +1,11 @@
-package service
+package services
 
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.actor.Actor
-import org.apache.kafka.clients.producer.KafkaProducer
 import play.api.Logger
-import model.CSVUpload
+import models.CSVUpload
 import play.api.libs.json.Json
 import com.google.inject.Inject
 import com.typesafe.config.ConfigFactory
@@ -20,7 +19,7 @@ class KafkaService @Inject(){
   }
 
   class KafkaSender(topic: String) extends Actor {
-    val producer = new KfkProducer(topic, url)
+    val producer = new KafkaProducer(topic, url)
 
     def receive = {
       case message: String => {
