@@ -75,6 +75,7 @@ class CSVController @Inject() (csvService: CSVService) extends Controller {
           BadRequest
         } else {
           waitingForUpload.remove(id)
+          csvService.signalUploadComplete(id)
           Ok
         }
     }

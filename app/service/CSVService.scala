@@ -6,8 +6,9 @@ import util.StreamingCSVBodyParser
 import model.CSVUpload
 import play.api.mvc.BodyParsers
 import play.api.Logger
+import akka.actor.ActorRef
 
-class CSVService @Inject() (storageProvider: FileStorageProvider) {
+class CSVService @Inject() (storageProvider: FileStorageProvider, kafkaService: KafkaService) {
   
   def buildBodyParser(fileName: Option[CSVUpload]) = {
     fileName match {
@@ -44,6 +45,10 @@ class CSVService @Inject() (storageProvider: FileStorageProvider) {
 
   def getCSVMetaData(id: String): Option[CSVUpload] = {
     getCSVMetadata(id)
+  }
+  
+  def signalUploadComplete(id: String) = {
+    getCSVMetadata(id).map(kafkaService.sendCSVUploadEvent(_))
   }
 
   private def getCSVMetadata(id: String): Option[CSVUpload] = {
