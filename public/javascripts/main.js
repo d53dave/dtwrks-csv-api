@@ -18,7 +18,7 @@
     '     </header> ' +
     '     <div class="mdl-card mdl-cell mdl-cell--9-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone"> ' +
     '         <div class="mdl-card__supporting-text"> ' +
-    '             <h4>{0}</h4> Id={1} ' +
+    '             <h4 style="max-width: 70%; word-wrap: break-word;">{0}</h4> Id: {1} ' +
     '         </div> ' +
     '     </div> ' +
     '     <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored downloadbutton" data-id="{1}"> ' +
@@ -102,17 +102,29 @@
       }
     })
   };
+  
+  function showUploadSpinner() {
+	$('#submit-upload-button').hide();
+	 $('#upload-spinner').show();
+  }
+  
+  function hideUploadSpinner() {
+	$('#upload-spinner').hide();
+	$('#submit-upload-button').show();
+  }
 
   function prepareUpload() {
 	var input = $('#the-file-input')[0];
 	if(!input) {
-      showSnackBar('An error occured. File input not available');
+	  showSnackbar('An error occured. File input not available');
       return;
 	}
 	if(input.files.length < 1) {
-	  showSnackBar('An error occured: no file available.');
+	  showSnackbar('An error occured: no file selected.');
 	  return;
 	}
+	
+	showUploadSpinner();
 	
     var file = $('#the-file-input')[0].files[0];
 
@@ -136,6 +148,7 @@
         },
         error: function () {
           showSnackbar('Upload unsuccessful')
+          hideUploadSpinner();
         }
     });
   }
@@ -155,15 +168,16 @@
       },
       error: function() {
         showSnackbar('Could not transmit data.');
-      }
+      },
+      complete: hideUploadSpinner
     });
   }
   
   $('#add').click(function() {
-	  $('#uploadAnchor').click();
+	  $('#the-file-input').click();
 	  setTimeout(function() {
-		  $('#the-file-input').click();
-	  }, 300);
+		  $('#uploadAnchor').click();
+	  }, 50);
   })
 
   $('#uploadSubmitButton').click(function () {
