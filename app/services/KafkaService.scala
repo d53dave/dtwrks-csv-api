@@ -13,6 +13,8 @@ import com.typesafe.config.ConfigFactory
 class KafkaService @Inject(){
   val url = ConfigFactory.load().getString("messagebroker.urls")
   val topic = ConfigFactory.load().getString("messagebroker.topic")
+  val system = ActorSystem("dtwrks-test-kafka")
+  val kafkaSender: ActorRef = system.actorOf(KafkaSender.props(topic), "uploader-producertest")
 
   object KafkaSender {
     def props(topic: String): Props = Props(new KafkaSender(topic))
@@ -31,12 +33,10 @@ class KafkaService @Inject(){
       }
     }
   }
-
-  val system = ActorSystem("dtwrks-test-kafka")
-  val kafkaProducer: ActorRef = system.actorOf(KafkaSender.props("myevents"), "producertest")
   
   def sendCSVUploadEvent(csv: CSVUpload): Unit = {
     val csvJSON = Json.toJson(csv).toString()
-    kafkaProducer ! s"""{ "event": "CSV Uploaded", "csv": $csvJSON }"""
+    
+    kafkaSender ! csvJSON
   }
 }
