@@ -17,7 +17,7 @@ case class StreamableResource(stream: Option[OutputStream], resource: Option[Clo
  *
  *  As it stands, FileStorageProvider is implemented only by [[storage.FilesystemStorage]],
  *  but any back-end that can implement this interface (i.e. most importantly can provide a 
- *  [[storage.StreamableResource]]) can be used, e.g. an RDBMS, streaming to a different web service, etc.
+ *  [[storage.StreamableResource]]) can be used, e.g. an RDBMS, streaming to file or a different web service, etc.
  */
 @ImplementedBy(classOf[FilesystemStorage])
 trait FileStorageProvider {

@@ -12,9 +12,9 @@ import akka.stream.scaladsl.Keep
 import play.api.libs.streams.Accumulator
 
 
-/** Body Parser that streams a request body into a StreamableResource.
+/** Body Parser that streams a request body into a StreamableResource (which basically wraps an output stream).
  *
- * This allows avoiding both loading large bodies into memory, as well as piping into temporary
+ * This allows avoiding loading large bodies into memory, as well as piping into temporary
  * files and moving them around later, and allows using any storage strategy/medium (i.e. anything that can
  * provide an OutputStream).
  */
