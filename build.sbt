@@ -28,11 +28,19 @@ scalacOptions ++= Seq(
 scalaVersion := "2.11.8"
 
 libraryDependencies += filters
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
 libraryDependencies += "com.github.pathikrit" %% "better-files" % "2.17.1"
 libraryDependencies += "org.apache.kafka" % "kafka_2.11" % "0.10.1.1"
+libraryDependencies += "com.typesafe.play" % "play-specs2_2.11" % "2.5.12" % "test"
+
+scalacOptions in Test ++= Seq("-Yrangepos")
 
 enablePlugins(sbtdocker.DockerPlugin)
+
+javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
+
+libraryDependencies ++= Seq(
+  ws
+)
 
 // Adds additional packages into Twirl
 // TwirlKeys.templateImports += "net.d53dev.dtwrks.controllers._"
