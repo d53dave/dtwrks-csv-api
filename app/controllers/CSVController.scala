@@ -12,22 +12,24 @@ import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import better.files.File
 import play.api.http.HttpEntity
+import play.api.mvc.AnyContentAsEmpty
 
+/**
+ * This controller offers the File Upload related API Endpoints
+ *
+ * The upload workflow is two-staged: first, a POST to /csv containing
+ * file metadata as a form is expected. This returns a CSVUpload object, which
+ * contains the id that should be used in the following POST to /csv/{id}/content
+ *
+ * This also provides a few convenience endpoints to support a minimal JavaScript client
+ * i.e. get all uploaded CSVs, remove CSVs, etc.
+ */
 @Singleton
 class CSVController @Inject() (csvService: CSVService) extends Controller {
 
-  var waitingForUpload = scala.collection.mutable.Map[String, CSVUpload]()
+  def waitingForUpload = scala.collection.mutable.Map[String, CSVUpload]()
 
   val logger: Logger = Logger.apply("application")
-
-  case class PreparedUpload[A](id: String, action: Action[A]) extends Action[A] {
-    def apply(request: Request[A]): Future[Result] = {
-      logger.debug(s"Checking for $id in $waitingForUpload")
-      if (waitingForUpload.contains(id)) action(request) else Future.successful(BadRequest)
-    }
-
-    val parser = action.parser
-  }
 
   def getCSVs = Action {
     Ok(Json.toJson(csvService.getAllUploadedCSVs()))
@@ -69,14 +71,14 @@ class CSVController @Inject() (csvService: CSVService) extends Controller {
   def uploadCSV(id: String) =
     Action(csvService.buildBodyParser(waitingForUpload.get(id))) {
       request =>
-        if (request.body.isInstanceOf[Unit]) {
-          waitingForUpload.remove(id)
-          csvService.deleteCSVifFound(id)
-          BadRequest
-        } else {
+        if (request.body.isInstanceOf[AnyContentAsRaw]) {
           waitingForUpload.remove(id)
           csvService.signalUploadComplete(id)
           Ok
+        } else {
+          waitingForUpload.remove(id)
+          csvService.deleteCsvIfFound(id)
+          BadRequest
         }
     }
 
@@ -88,7 +90,7 @@ class CSVController @Inject() (csvService: CSVService) extends Controller {
   }
 
   def deleteCSV(id: String) = Action {
-    val success = csvService.deleteCSVifFound(id)
+    val success = csvService.deleteCsvIfFound(id)
 
     if (success) Ok else NotFound
   }
