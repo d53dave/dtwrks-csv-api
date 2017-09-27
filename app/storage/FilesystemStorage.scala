@@ -14,7 +14,7 @@ import play.api.Logger
 
 @Inject
 class FilesystemStorage extends FileStorageProvider {
-  val logger: Logger = Logger.apply("application")
+  val logger: Logger = Logger(this.getClass)
 
   private val basePath = Try {
     val path = ConfigFactory.load().getString("storage.filesystem.basepath")
